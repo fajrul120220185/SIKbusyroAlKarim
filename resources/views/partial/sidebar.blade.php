@@ -96,8 +96,8 @@
             @endforeach
           </li>
           <!-- Transaksi -->
-          <li class="nav-item @if(Request::is('transaksi/*')) menu-open @endif">
-            <a href="#" class="nav-link @if(Request::is('transaksi/*')) active @endif">
+          <li class="nav-item @if(Request::is('transaksi/*') || Request::is('transaksisaldo-awal/*')) menu-open @endif">
+            <a href="#" class="nav-link @if(Request::is('transaksi/*') || Request::is('transaksisaldo-awal/*')) active @endif">
               <i class="fas fa-money-bill"></i>
               <p>
                 Transaksi
@@ -128,6 +128,14 @@
                 </a>
               </li>
             </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href=" "  class="nav-link @if(Request::is('saldo-awal')) active @endif" data-toggle="modal" data-target="#saldoAwal">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Saldo Awal</p>
+                </a>
+              </li>
+            </ul>
           </li>
 
           <!-- Gaji -->
@@ -136,6 +144,28 @@
               <i class="nav-icon fas fa-edit"></i>
               <p>
                 Gaji
+              </p>
+            </a>
+          </li>
+
+          <!-- Bos -->
+          <li class="nav-item">
+            <a href="{{ route('bosIndex') }}" class="nav-link @if(Request::is('bos') || Request::is('bos/*')) active @endif">
+              <i class="nav-icon fas fa-school"></i>
+              <!-- <i class="fa-solid fa-building-ngo"></i> -->
+              <p>
+                BOS
+              </p>
+            </a>
+          </li>
+
+           <!-- Saving -->
+           <li class="nav-item">
+            <a href="{{ route('savingIndex') }}" class="nav-link @if(Request::is('saving') || Request::is('saving/*')) active @endif">
+              <i class="nav-icon fas fa-building"></i>
+              <!-- <i class="fa-solid fa-building-columns"></i> -->
+              <p>
+                Saving
               </p>
             </a>
           </li>

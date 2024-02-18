@@ -18,6 +18,7 @@ class Pengeluaran extends Model
         'transaksi',
         'desc',
         'jumlah',
+        'sumber',
         'bukti',
         'tanggal',
     ];

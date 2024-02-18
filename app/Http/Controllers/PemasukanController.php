@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Auth;
 
 use App\Models\Pemasukan;
-use App\Models\Mtransaksi;
+use App\Models\MTransaksi;
 use App\Models\GrandSaldo;
 
 class PemasukanController extends Controller
@@ -22,7 +22,7 @@ class PemasukanController extends Controller
     {
         $data['title'] = "Pemasukan";
         $data['pemasukan'] = Pemasukan::get();
-        $data['transaksi'] = Mtransaksi::where('jenis', '=', 'pemasukan')->get();
+        $data['transaksi'] = MTransaksi::where('jenis', '=', 'pemasukan')->get();
         return view('transaksi.pemasukan.main')->with($data);
     }
     public function post(Request $request)
@@ -31,7 +31,7 @@ class PemasukanController extends Controller
        
         if ($grand) {
             $id_transaksi = $request->id_transaksi;
-            $transaksi = Mtransaksi::where('id', $id_transaksi)->first();
+            $transaksi = MTransaksi::where('id', $id_transaksi)->first();
             $file = $request->bukti;
             $fileName = time() . $transaksi->nama . $file->getClientOriginalName();
             $destination = 'uploads/pemasukan';
@@ -44,6 +44,7 @@ class PemasukanController extends Controller
             $pengeluaran = Pemasukan::create([
                     'id_transaksi'=>$request->id_transaksi,
                     'transaksi'=>$transaksi->nama,
+                    'jumlah_diterima'=>$request->jumlah,
                     'jumlah'=>$request->jumlah,
                     'bukti'=>$fileName,
                     'tanggal'=>$request->tanggal,
@@ -82,7 +83,7 @@ class PemasukanController extends Controller
 
             if ($grand) {
                 $id_transaksi = $request->id_transaksi;
-                $transaksi = Mtransaksi::where('id', $id_transaksi)->first();
+                $transaksi = MTransaksi::where('id', $id_transaksi)->first();
                 $file = $request->bukti;
                 if ($file !== null && is_a($file, 'Illuminate\Http\UploadedFile') && $file->isValid()) {
                     $fileName = time() . $transaksi->nama . $file->getClientOriginalName();
@@ -123,35 +124,6 @@ class PemasukanController extends Controller
                     ]);
                    
                     $file->move($absoluteDestination, $fileName);
-                    return response()->json(['success' => true ,'message' => 'updated successfully!', 'Saldo' =>$grand]);
-                }else {
-                    $kalkulasi = $DataPengeluaran->jumlah;
-                    $jumlah = $request->jumlah;
-                    if ($kalkulasi > $jumlah) {
-                        $newJumlah = $kalkulasi - $jumlah;
-                        $lastSaldo = $grand->saldo;
-                        $saldo = $lastSaldo - $newJumlah; 
-                    }elseif ($kalkulasi < $jumlah) {
-                        $newJumlah = $jumlah - $kalkulasi;
-                        $lastSaldo = $grand->saldo;
-                        $saldo = $lastSaldo + $newJumlah; 
-                    }else {
-                        $saldo = $grand->saldo;
-                    }
-
-
-                    $newSaldo = GrandSaldo::create([
-                        'saldo' => $saldo
-                    ]);
-
-                    $DataPengeluaran->update([
-                            'id_transaksi'=>$request->id_transaksi,
-                            'transaksi'=>$transaksi->nama,
-                            'jumlah'=>$request->jumlah,
-                            'tanggal'=>$request->tanggal,
-                            'desc'=>$request->desc,
-
-                    ]);                   
                     return response()->json(['success' => true ,'message' => 'updated successfully!', 'Saldo' =>$grand]);
                 }
                

@@ -15,9 +15,10 @@
                     <th>Transaksi</th>
                     <th>Deskripsi</th>
                     <th>Nominal</th>
+                    <th>Sumber</th>
                     <th>Bukti</th>
                     <th>Tanggal</th>
-                    <th>Action</th>
+                    <!-- <th>Action</th> -->
                   </tr>
                   </thead>
                   <tbody>
@@ -29,14 +30,15 @@
                         <textarea class="form-control" rows="3" readonly>{{$pengeluaran->desc}}</textarea>
                     </td>
                     <td>{{$pengeluaran->jumlah}}</td>
+                    <td>{{$pengeluaran->sumber}}</td>
                     <td>
                     <img src="{{ asset('/uploads/pengeluaran/' . $pengeluaran->bukti) }}" alt=""  width="70" height="70"><br>    
                     </td>
                     <td>{{$pengeluaran->tanggal}}</td>
-                    <td>
+                    <!-- <td>
                     <button type="button" class="btn btn-outline-warning Edit"  data-id="{{$pengeluaran->id}}"> <i class="fas fa-edit"></i></button>
                         <button type="button" class="btn btn-outline-danger Delete"  data-id="{{$pengeluaran->id}}"> <i class="fas fa-trash"></i></button>
-                    </td>
+                    </td> -->
                  </tr>
                  @endforeach
                   </tbody>
@@ -48,7 +50,7 @@
                     <th>Nominal</th>
                     <th>Bukti</th>
                     <th>Tanggal</th>
-                    <th></th>
+                    <!-- <th></th> -->
                   </tr>
                   </tfoot>
                 </table>
@@ -82,6 +84,37 @@
                 <div class="form-group">
                     <label for="exampleInputEmail1">Nominal</label>
                     <input type="number" class="form-control" id="jumlah" required>
+                </div>
+                <div class="form-group">
+                    <label for="">Sumber</label>
+                    <select name="sumberInput" class="form-control select2" data-placeholder="Pilih Satu!" id="sumberInput" required>
+                        <option value="SPP">SPP</option>
+                        <option value="Saving">Saving</option>
+                        <option value="BOS">BOS</option>
+                        <option value="Ekskul">Ekskul</option>
+                        <option value="KegiatanSiswa">Kegiatan Siswa</option>
+                        <option value="PemasukanLain">Pemasukan Lain</option>
+                    </select>
+                </div>
+                <div id="kegSiswa" style="display: none !important;">
+                    <div class="form-group">
+                        <label for="">Kegiatan Siswa</label>
+                        <select name="idKegiatan" id="dariSiswa" class="form-control select2" data-placeholder="Pilih Satu!">
+                            @foreach($kegiatanSiswa as $siswa)
+                            <option value="{{$siswa->id}}">{{$siswa->name}} -- <strong>{{number_format ($siswa->saldo),2,0}}</strong></option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div id="pemasukan" style="display: none !important;">
+                    <div class="form-group">
+                        <label for="">Pemasukan</label>
+                        <select name="idPemasukan" id="pemasukanLain" class="form-control select2" data-placeholder="Pilih Satu!">
+                            @foreach($pemasukan as $pem)
+                            <option value="{{$pem->id}}">{{$pem->transaksi}} -- <strong>{{number_format ($pem->jumlah),2,0}}</strong></option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Bukti</label>
@@ -133,6 +166,16 @@
                     <input type="hidden" id="id">
                 </div>
                 <div class="form-group">
+                    <label for="">Sumber</label>
+                    <select name="sumberInput" class="form-control select2" data-placeholder="Pilih Satu!" id="sumberInput" required>
+                        <option value="SPP">SPP</option>
+                        <option value="BOS">BOS</option>
+                        <option value="Ekskul">Ekskul</option>
+                        <option value="KegiatanSiswa">Kegiatan Siswa</option>
+                        <option value="PemasukanLain">Pemasukan Lain</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="exampleInputEmail1">Bukti</label>
                     <input type="file" class="form-control" id="buktiEdit">
                 </div>
@@ -161,13 +204,28 @@
         var jumlah = $('#jumlah').val();
         var tanggal = $('#tanggal').val();
         var desc = $('#desc').val();
+        var sumberInput = $('#sumberInput').val();
+        var idKegiatan = $('#dariSiswa').val();
+        var idPemasukan = $('#pemasukanLain').val();
         var fileInput = document.getElementById('bukti'); // Mengambil elemen input file
         var bukti = fileInput.files[0]; 
+        if (!id_transaksi || !jumlah || !tanggal || !desc || !bukti || !sumberInput) {
+        // If any of the required fields are empty, show an error message and return
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Ada yang belum kamu isi, cek kembali Ya !!',
+        });
+        return;
+        }
         var formData = new FormData();
             formData.append('id_transaksi', id_transaksi);
             formData.append('jumlah', jumlah);
             formData.append('tanggal', tanggal);
             formData.append('desc', desc);
+            formData.append('sumberInput', sumberInput);
+            formData.append('idKegiatan', idKegiatan);
+            formData.append('idPemasukan', idPemasukan);
             formData.append('bukti', bukti);
         $.ajaxSetup({
             headers: {
@@ -458,6 +516,30 @@
                 console.log('error:', data);
             }
         });
+    });
+});
+</script>
+
+<script>
+$('#modal-manual').on('shown.bs.modal', function () {
+    $('#sumberInput').on('change', function() {
+        var sumberInput = $(this).val();
+        var kegSiswa = $('#kegSiswa');
+        var dariSiswa = $('#dariSiswa');
+        var pemasukan = $('#pemasukan');
+        
+        if (sumberInput == "KegiatanSiswa") {
+            kegSiswa.show();
+            dariSiswa.attr('required', 'required');
+        } else {
+            kegSiswa.hide();
+            dariSiswa.removeAttr('required');
+        }
+        if (sumberInput == "PemasukanLain") {
+            pemasukan.show();
+        } else {
+            pemasukan.hide();
+        }
     });
 });
 </script>

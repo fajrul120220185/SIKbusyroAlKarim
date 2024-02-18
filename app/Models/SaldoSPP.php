@@ -5,21 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pemasukan extends Model
+class SaldoSPP extends Model
 {
     use HasFactory;
-
-    protected $table = 'pemasukan';
+    protected $table = 'saldo_spp';
     public $timestamps = false;
     protected $primaryKey = 'id';
 
     public $fillable = [
-        'id_transaksi',
-        'transaksi',
+        'keluar_masuk',
+        'jumlah_km',
         'desc',
-        'jumlah_diterima',
-        'jumlah',
-        'bukti',
-        'tanggal',
+        'saldo',
+        'user',
+        'bulan',
+        'tahun',
     ];
 }

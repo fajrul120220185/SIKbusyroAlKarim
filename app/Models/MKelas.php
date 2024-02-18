@@ -18,7 +18,9 @@ class MKelas extends Model
         'grade',
         'guru_id',
         'walikelas',
-        'tarif_spp'
+        'tarif_spp',
+        'tarif_ekskul',
+        'total',
     ];
 
    

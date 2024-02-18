@@ -20,7 +20,7 @@ class KelasController extends Controller
     
     public function Main()
     {
-        $data['title'] = 'Master Guru';
+        $data['title'] = 'Master Kelas';
         
         $data['guru'] = MGuru::get();
         $data['kelas'] = MKelas::orderBy('kelas', 'asc')->get();
@@ -35,7 +35,7 @@ class KelasController extends Controller
         $guru = MGuru::where('id', $id_guru)->first();
         $namaKelas = $request->kelas;
         $class = substr($namaKelas, 0, 1); 
-        $grade = substr($namaKelas, 1);        
+        $grade = substr($namaKelas, 1);       
         if ($guru) {
             $kelas = MKelas::create([
                 'kelas' => $class,
@@ -43,6 +43,8 @@ class KelasController extends Controller
                 'guru_id' => $guru->id,
                 'walikelas' => $guru->name,
                 'tarif_spp' => $request->tarif_spp,
+                'tarif_ekskul' => $request->tarif_ekskul,
+                'total' => $request->tarif_spp + $request->tarif_ekskul,
             ]);
     
             return response()->json(['success' => true ,'message' => 'updated successfully!','data'=> $kelas,]);
@@ -80,7 +82,8 @@ class KelasController extends Controller
                 'guru_id' => $guru->id,
                 'walikelas' => $guru->name,
                 'tarif_spp' => $request->tarif_spp,
-
+                'tarif_ekskul' => $request->tarif_ekskul,
+                'total' => $request->tarif_spp + $request->tarif_ekskul,
             ]);
             
         return response()->json(['success' => true ,'message' => 'updated successfully!','data'    => $kelas,]);
@@ -120,7 +123,7 @@ class KelasController extends Controller
     {
         $id = $request->id;
         $kel = MKelas::where('id', $request->kelas)->first();
-        $hargaAPP = $kel->tarif_spp;
+        $hargaAPP = $kel->total;
 
         $tahunSekarang = Carbon::now()->year;
 

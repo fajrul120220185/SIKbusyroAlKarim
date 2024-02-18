@@ -18,6 +18,7 @@ class MTranSiswa extends Model
         'kelas_id',
         'kelas',
         'jumlah',
+        'saldo',
         'done',
         'created_at',
         'end_date',

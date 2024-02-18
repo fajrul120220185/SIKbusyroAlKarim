@@ -31,7 +31,7 @@ class MasterSiswa implements ToCollection, WithHeadingRow
             $grade = substr($kelas, 1);
             $dataKelas = MKelas::where('kelas', $class)->where('grade', $grade)->first();
             $idKelas = $dataKelas->id;
-            $hargaAPP = $dataKelas->tarif_spp;
+            $hargaAPP = $dataKelas->total;
             // Hitung selisih tahun
             $selisihTahun = $tahunSekarang - $angkatan;
 

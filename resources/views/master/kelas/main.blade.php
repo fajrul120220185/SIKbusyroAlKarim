@@ -17,6 +17,7 @@
                     <th>Kelas</th>
                     <th>Wali Kelas</th>
                     <th>Tarif SPP</th>
+                    <th>Tarif Ekskul</th>
                     <th>Action</th>
                   </tr>
                   </thead>
@@ -27,6 +28,7 @@
                     <td>{{$kelas->kelas}}{{$kelas->grade}}</td>
                     <td>{{$kelas->walikelas}}</td>
                     <td>Rp. {{ number_format($kelas->tarif_spp, 2, ',', '.') }}</td>
+                    <td>Rp. {{ number_format($kelas->tarif_ekskul, 2, ',', '.') }}</td>
                     <td>
                         <button type="button" class="btn btn-outline-warning Edit"  data-id="{{$kelas->id}}"> <i class="fas fa-edit"></i></button>
                         <button type="button" class="btn btn-outline-danger Delete"  data-id="{{$kelas->id}}"> <i class="fas fa-trash"></i></button>
@@ -75,6 +77,10 @@
                     <label for="exampleInputEmail1">Tarif SPP</label>
                     <input type="number" class="form-control" id="tarif_spp">
                 </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Tarif Ekskul</label>
+                    <input type="number" class="form-control" id="tarif_ekskul">
+                </div>
             </div>
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -117,6 +123,10 @@
                     <label for="exampleInputEmail1">Tarif SPP</label>
                     <input type="number" class="form-control" id="tarif_sppEdit">
                 </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Tarif Ekskul</label>
+                    <input type="number" class="form-control" id="tarif_ekskulEdit">
+                </div>
             </div>
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -138,6 +148,7 @@
             'kelas': $('#kelas').val(),
             'id_guru': $('#id_guru').val(),
             'tarif_spp': $('#tarif_spp').val(),
+            'tarif_ekskul': $('#tarif_ekskul').val(),
    
         }
         $.ajaxSetup({
@@ -223,6 +234,7 @@
             'kelas': $('#kelas_edit').val(),
             'id_guru': $('#id_guru_edit').val(),
             'tarif_spp': $('#tarif_sppEdit').val(),
+            'tarif_ekskul': $('#tarif_ekskulEdit').val(),
         }
         $.ajaxSetup({
             headers: {
@@ -410,6 +422,7 @@
                 $('#EditModal #kelas_edit').val(response.data.kelas + response.data.grade);
                 $('#EditModal #id_guru_edit').val(response.data.guru_id);
                 $('#EditModal #tarif_sppEdit').val(response.data.tarif_spp);
+                $('#EditModal #tarif_ekskulEdit').val(response.data.tarif_ekskul);
                
     
             },

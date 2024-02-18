@@ -12,6 +12,9 @@ use App\Http\Controllers\SPPController;
 use App\Http\Controllers\TransisController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\SaldoAwal;
+use App\Http\Controllers\BosController;
+use App\Http\Controllers\SavingController;
 
 
 /*
@@ -136,3 +139,20 @@ Route::get('/pembayaran-siswa/pay/getData', [PembayaranController::class, 'getDa
 Route::get('/pembayaran-siswa/pay/prosesBayar', [PembayaranController::class, 'prosesBayar'])->name('prosesBayar');
 Route::post('/pembayaran-siswa/paySiswa', [PembayaranController::class, 'PaySiswa'])->name('PaySiswa');
 Route::get('/pembayaran-siswa/kwitansi/{spp?}/{kegiatan?}/{siswa?}', [PembayaranController::class, 'kwitansi'])->name('kwitansi');
+
+// Saldo Awal
+Route::get('/saldo-awal', [SaldoAwal::class, 'saldoView'])->name('saldoView');
+Route::get('/saldo-awal/login', [SaldoAwal::class, 'saldoAwalLogin'])->name('saldoAwalLogin');
+Route::get('/saldo-awal/spp-password', [SaldoAwal::class, 'SPPlogin'])->name('SPPlogin');
+Route::post('/saldo-awal/input-saldo', [SaldoAwal::class, 'InputSaldo'])->name('InputSaldo');
+Route::get('/saldo-awal/tracking', [SaldoAwal::class, 'trackingSaldo'])->name('trackingSaldo');
+
+
+
+// Bos
+Route::get('/bos', [BosController::class, 'index'])->name('bosIndex');
+Route::post('/bos-input', [BosController::class, 'store'])->name('inputDanaBOS');
+
+// Saving
+Route::get('/saving', [SavingController::class, 'index'])->name('savingIndex');
+Route::post('/saving-post', [SavingController::class, 'store'])->name('savingInput');

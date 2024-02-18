@@ -69,7 +69,7 @@ class TransisController extends Controller
                 $sudahBayar = $transaksiSiswa->jumlah;
                 $bayarNow = $request->jumlah;
                 $total = $sudahBayar + $bayarNow;
-                $kurangBayar = $transaksiSiswa->kurang - $total; 
+                $kurangBayar = $transaksiSiswa->harus_bayar - $total; 
                 if ($harga == $total) {
                     $lunas = "Y";
                     $lunas_at = Carbon::now();
@@ -90,6 +90,10 @@ class TransisController extends Controller
                     'kurang' => $kurangBayar,
                     'paid_at'=>$paid_at,
                     'lunas_at'=>$lunas_at,
+                ]);
+
+                $transaksi->update([
+                    'saldo' => $transaksi->saldo + $request->jumlah,
                 ]);
 
                 $kwitansi = Kwitansi::create([

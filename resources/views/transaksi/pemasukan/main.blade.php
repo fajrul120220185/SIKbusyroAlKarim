@@ -15,9 +15,10 @@
                     <th>Transaksi</th>
                     <th>Deskrisi</th>
                     <th>Nominal</th>
+                    <th>Tersisa</th>
                     <th>Bukti</th>
                     <th>Tanggal</th>
-                    <th>Action</th>
+                    <!-- <th>Action</th> -->
                   </tr>
                   </thead>
                   <tbody>
@@ -26,15 +27,16 @@
                     <td>{{$loop->iteration}}</td>
                     <td>{{$pemasukan->transaksi}}</td>
                     <td>                    <textarea class="form-control" rows="3" readonly>{{$pemasukan->desc}}</textarea></td>
-                    <td>{{$pemasukan->jumlah}}</td>
+                    <td> <strong>Rp.{{number_format ($pemasukan->jumlah_diterima),2,0}} </strong></td>
+                    <td> <strong>Rp.{{number_format ($pemasukan->jumlah),2,0}} </strong></td>
                     <td>
                     <img src="{{ asset('/uploads/pemasukan/' . $pemasukan->bukti) }}" alt=""  width="70" height="70"><br>    
                     </td>
                     <td>{{$pemasukan->tanggal}}</td>
-                    <td>
+                    <!-- <td>
                     <button type="button" class="btn btn-outline-warning Edit"  data-id="{{$pemasukan->id}}"> <i class="fas fa-edit"></i></button>
                         <button type="button" class="btn btn-outline-danger Delete"  data-id="{{$pemasukan->id}}"> <i class="fas fa-trash"></i></button>
-                    </td>
+                    </td> -->
                  </tr>
                  @endforeach
                   </tbody>
@@ -44,9 +46,10 @@
                     <th>Transaksi</th>
                     <th>Deskripsi</th>
                     <th>Nominal</th>
+                    <th>Tersisa</th>
                     <th>Bukti</th>
                     <th>Tanggal</th>
-                    <th></th>
+                    <!-- <th></th> -->
                   </tr>
                   </tfoot>
                 </table>
@@ -64,6 +67,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
+            <form action="">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="exampleInputEmail1">Transaksi</label>
@@ -83,7 +87,7 @@
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Bukti</label>
-                    <input type="file" class="form-control" id="bukti">
+                    <input type="file" class="form-control" id="bukti" required>
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Tanggal</label>
@@ -95,6 +99,7 @@
               <button type="button" class="btn btn-primary SaveManual">Save</button>
             </div>
           </div>
+          </form>
           <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
@@ -161,6 +166,16 @@
         var desc = $('#desc').val();
         var fileInput = document.getElementById('bukti'); // Mengambil elemen input file
         var bukti = fileInput.files[0]; 
+
+        if (!id_transaksi || !jumlah || !tanggal || !desc || !bukti) {
+        // If any of the required fields are empty, show an error message and return
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Ada yang belum kamu isi, cek kembali Ya !!',
+        });
+        return;
+        }
         var formData = new FormData();
             formData.append('id_transaksi', id_transaksi);
             formData.append('jumlah', jumlah);
@@ -253,7 +268,16 @@
         var tanggal = $('#tanggalEdit').val();
         var desc = $('#descEdit').val();
         var fileInput = document.getElementById('buktiEdit'); // Mengambil elemen input file
-        var bukti = fileInput.files[0]; 
+        var bukti = fileInput.files[0];
+        if (!id_transaksi || !jumlah || !tanggal || !desc || !bukti) {
+        // If any of the required fields are empty, show an error message and return
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Ada yang belum kamu isi, cek kembali Ya !!',
+        });
+        return;
+        } 
         var formData = new FormData();
             formData.append('id', id);
             formData.append('id_transaksi', id_transaksi);

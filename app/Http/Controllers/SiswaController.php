@@ -35,7 +35,7 @@ class SiswaController extends Controller
         $formattedDate = $now->format('Y-m-d H:i:s'); // Format tanggal
         $kelas_id = $request->kelas;
         $kelas = MKelas::where('id', $kelas_id)->first();
-        $hargaAPP = $kelas->tarif_spp;
+        $hargaAPP = $kelas->total;
 
         $kelasName = $kelas->kelas;
         $grade = $kelas->grade;
@@ -116,7 +116,7 @@ class SiswaController extends Controller
         $id = $request->id;
         $kelas_id = $request->kelas;
         $kelas = MKelas::where('id', $kelas_id)->first();
-        $hargaAPP = $kelas->tarif_spp;
+        $hargaAPP = $kelas->total;
 
         $tahunSekarang = Carbon::now()->year;
 

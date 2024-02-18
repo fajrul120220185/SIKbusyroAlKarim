@@ -6,11 +6,14 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
 
-use App\Models\Msiswa;
+use App\Models\MSiswa;
 use App\Models\MKelas;
 use App\Models\SPP;
 use App\Models\TransaksiSiswa;
 use App\Models\GrandSaldo;
+use App\Models\SaldoSPP;
+use App\Models\SaldoEkskul;
+use App\Models\MTranSiswa;
 
 class PembayaranController extends Controller
 {
@@ -130,12 +133,21 @@ class PembayaranController extends Controller
     public function PaySiswa(Request $request)
     {
         $idSPP = $request->spp_id;
+       
         $transId = $request->trans_id;
 
+
+        $currentMonthName = date('F');
+        $currentYear = date('Y');
         // dd($idSPP, $transId);
         if (!empty($idSPP)) {
             foreach ($idSPP as $sppId) {
                 $spp = SPP::where('id', $sppId)->first();
+                $idKelas = $spp->kelas_id;
+                $kelas = MKelas::where('id', $idKelas)->first();
+                
+                $hargaSPP = $kelas->tarif_spp;
+                $hargaEkskul = $kelas->tarif_ekskul;
                 if ($spp) {
                     $spp->update([
                         'jumlah' => $spp->harus_bayar,
@@ -148,6 +160,29 @@ class PembayaranController extends Controller
                 $Grs = GrandSaldo::create([
                     'saldo'=>$newSaldo
                 ]);
+                        $saldoSPP = SaldoSPP::orderBy('id', 'desc')->first();
+                        $oldSPP = $saldoSPP->saldo;
+                        $newSaldoSPP = SaldoSPP::create([
+                            'keluar_masuk' => 'M',
+                            'jumlah_km' => $hargaSPP,
+                            'desc' => 'Pembayaran dari ' . $spp->name . ' ' . $spp->nis . ' bulan ' . $spp->bulan . '-' . $spp->tahun,
+                            'saldo' => $hargaSPP + $oldSPP,
+                            'user' => Auth::user()->id,
+                            'bulan' => $currentMonthName,
+                            'tahun' => $currentYear,
+                        ]);
+
+                        $saldoEkskul = SaldoEkskul::orderBy('id', 'desc')->first();
+                        $oldEkskul = $saldoEkskul->saldo;
+                        $newSaldoEkskul = SaldoEkskul::create([
+                            'keluar_masuk' => 'M',
+                            'jumlah_km' => $hargaEkskul,
+                            'desc' => 'Pembayaran dari ' . $spp->name . ' ' . $spp->nis . ' bulan ' . $spp->bulan . '-' . $spp->tahun,
+                            'saldo' => $hargaEkskul + $oldSPP,
+                            'user' => Auth::user()->id,
+                            'bulan' => $currentMonthName,
+                            'tahun' => $currentYear,
+                        ]);
             }
         }
        
@@ -155,6 +190,8 @@ class PembayaranController extends Controller
         if (!empty($transId)) {
             foreach ($transId as $trans) {
                 $kegiatan = TransaksiSiswa::where('id', $trans)->first();
+                $idTransSiswa = $kegiatan->trans_id;
+                $transaksi = MTranSiswa::where('id', $idTransSiswa)->first();
                 if ($kegiatan) {
                     $harusBayar = $kegiatan->harus_bayar;
                     $oldJumlah = $kegiatan->jumlah;
@@ -177,6 +214,11 @@ class PembayaranController extends Controller
                         'lunas' => $lunas,
                         'lunas_at' => $lunas_at,
                     ]);
+
+                    $transaksi->update([
+                        'saldo' => $transaksi->saldo + $jumlah,
+                    ]);
+    
                     $saldo  = GrandSaldo::orderBy('id', 'desc')->first();
                     $lastSaldo = $saldo->saldo;
                     $newSaldo = $lastSaldo + $jumlah;

@@ -11,6 +11,9 @@ use App\Models\Msiswa;
 use App\Models\spp;
 use App\Models\GrandSaldo;
 use App\Models\Kwitansi;
+use App\Models\SaldoSPP;
+use App\Models\SaldoEkskul;
+use Auth;
 
 class SPPController extends Controller
 {
@@ -32,7 +35,7 @@ class SPPController extends Controller
         $klz = $kelas;
         if ($mkelas) {
             # code...
-            $data['tarif'] = $mkelas->tarif_spp;
+            $data['tarif'] = $mkelas->total;
         }else {
             $data['tarif'] = '0';
         }
@@ -49,9 +52,14 @@ class SPPController extends Controller
         if ($siswa) {
             
             $kelas_id = $siswa->kelas_id;
+            $kelasSiswa = MKelas::where('id', $kelas_id)->first();
+            $hargaSPP = $kelasSiswa->tarif_spp;
+            $hargaEkskul = $kelasSiswa->tarif_ekskul;
 
             $bulan = $request->bulan;
             $tahun = $request->tahun;
+            $currentMonthName = date('F');
+            $currentYear = date('Y');
            
            
                 $file = $request->bukti;
@@ -82,7 +90,31 @@ class SPPController extends Controller
                             'lunas'=>"Y",
                             'paid_at'=>$request->paid_at,
                         ]);
-            
+                        
+                        $saldoSPP = SaldoSPP::orderBy('id', 'desc')->first();
+                        $oldSPP = $saldoSPP->saldo;
+                        $newSaldoSPP = SaldoSPP::create([
+                            'keluar_masuk' => 'M',
+                            'jumlah_km' => $hargaSPP,
+                            'desc' => 'Pembayaran dari ' . $spp->name . '-' . $spp->nis . ' bulan ' . $bulan . '-' . $tahun,
+                            'saldo' => $hargaSPP + $oldSPP,
+                            'user' => Auth::user()->id,
+                            'bulan' => $currentMonthName,
+                            'tahun' => $currentYear,
+                        ]);
+
+                        $saldoEkskul = SaldoEkskul::orderBy('id', 'desc')->first();
+                        $oldEkskul = $saldoEkskul->saldo;
+                        $newSaldoEkskul = SaldoEkskul::create([
+                            'keluar_masuk' => 'M',
+                            'jumlah_km' => $hargaEkskul,
+                            'desc' => 'Pembayaran dari ' . $spp->name . '-' . $spp->nis .  'bulan ' . $bulan . '-' . $tahun,
+                            'saldo' => $hargaEkskul + $oldSPP,
+                            'user' => Auth::user()->id,
+                            'bulan' => $currentMonthName,
+                            'tahun' => $currentYear,
+                        ]);
+
                         $saldo  = GrandSaldo::orderBy('id', 'desc')->first();
                         $lastSaldo = $saldo->saldo;
                         $newSaldo = $lastSaldo + $request->jumlah;
