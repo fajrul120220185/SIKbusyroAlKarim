@@ -47,7 +47,7 @@ class SavingController extends Controller
             if ($saldoSPP >= $jumlah) {
                $saving = Saving::create([
                 'jumlah' => $request->jumlah,
-                'sumber' => "SPP",
+                'sumber' => "SPP" . $currentMonthName . '-' . $currentYear,
                 'user' => Auth::user()->id,
                 'bulan' => $currentMonthName,
                 'tahun' => $currentYear,
@@ -55,7 +55,7 @@ class SavingController extends Controller
                $newSaldoSaving = SaldoSaving::create([
                 'keluar_masuk' => 'M',
                 'jumlah_km' => $request->jumlah,
-                'desc' => 'Dari SPP',
+                'desc' => 'Dari SPP ' . $currentMonthName . '-' . $currentYear,
                 'saldo' => $oldSaldoSaving + $jumlah,
                 'user' => Auth::user()->id,
                 'bulan' => $currentMonthName,
@@ -80,7 +80,7 @@ class SavingController extends Controller
            if ($saldoBos >= $jumlah) {
                 $saving = Saving::create([
                 'jumlah' => $request->jumlah,
-                'sumber' => "BOS",
+                'sumber' => "BOS" . $currentMonthName . '-' . $currentYear,
                 'user' => Auth::user()->id,
                 'bulan' => $currentMonthName,
                 'tahun' => $currentYear,
@@ -88,7 +88,7 @@ class SavingController extends Controller
                $newSaldoSaving = SaldoSaving::create([
                 'keluar_masuk' => 'M',
                 'jumlah_km' => $request->jumlah,
-                'desc' => 'Dari BOS',
+                'desc' => 'Dari BOS ' . $currentMonthName . '-' . $currentYear,
                 'saldo' => $oldSaldoSaving + $jumlah,
                 'user' => Auth::user()->id,
                 'bulan' => $currentMonthName,
@@ -113,7 +113,7 @@ class SavingController extends Controller
             if ($saldoEkskul >= $jumlah) {
                     $saving = Saving::create([
                     'jumlah' => $request->jumlah,
-                    'sumber' => "Ekskul",
+                    'sumber' => "Ekskul" . $currentMonthName . '-' . $currentYear,
                     'user' => Auth::user()->id,
                     'bulan' => $currentMonthName,
                     'tahun' => $currentYear,
@@ -121,7 +121,7 @@ class SavingController extends Controller
                    $newSaldoSaving = SaldoSaving::create([
                     'keluar_masuk' => 'M',
                     'jumlah_km' => $request->jumlah,
-                    'desc' => 'Dari Ekskul',
+                    'desc' => 'Dari Ekskul ' . $currentMonthName . '-' . $currentYear,
                     'saldo' => $oldSaldoSaving + $jumlah,
                     'user' => Auth::user()->id,
                     'bulan' => $currentMonthName,
@@ -146,7 +146,7 @@ class SavingController extends Controller
             if ($saldoSiswa >= $jumlah) {
                 $saving = Saving::create([
                     'jumlah' => $request->jumlah,
-                    'sumber' => $tranSiswa->name,
+                    'sumber' => $tranSiswa->name . $currentMonthName . '-' . $currentYear,
                     'user' => Auth::user()->id,
                     'bulan' => $currentMonthName,
                     'tahun' => $currentYear,
@@ -154,7 +154,7 @@ class SavingController extends Controller
                    $newSaldoSaving = SaldoSaving::create([
                     'keluar_masuk' => 'M',
                     'jumlah_km' => $request->jumlah,
-                    'desc' => 'Dari '. $tranSiswa->name,
+                    'desc' => 'Dari '. $tranSiswa->name . $currentMonthName . '-' . $currentYear,
                     'saldo' => $oldSaldoSaving + $jumlah,
                     'user' => Auth::user()->id,
                     'bulan' => $currentMonthName,
@@ -173,7 +173,7 @@ class SavingController extends Controller
             if ($saldoPemasukan >= $jumlah) {
                 $saving = Saving::create([
                     'jumlah' => $request->jumlah,
-                    'sumber' => $pemasukan->transaksi,
+                    'sumber' => $pemasukan->transaksi . $currentMonthName . '-' . $currentYear,
                     'user' => Auth::user()->id,
                     'bulan' => $currentMonthName,
                     'tahun' => $currentYear,
@@ -181,7 +181,7 @@ class SavingController extends Controller
                    $newSaldoSaving = SaldoSaving::create([
                     'keluar_masuk' => 'M',
                     'jumlah_km' => $request->jumlah,
-                    'desc' => 'Dari '. $pemasukan->transaksi,
+                    'desc' => 'Dari '. $pemasukan->transaksi . $currentMonthName . '-' . $currentYear,
                     'saldo' => $oldSaldoSaving + $jumlah,
                     'user' => Auth::user()->id,
                     'bulan' => $currentMonthName,

@@ -128,8 +128,8 @@ Route::get('/transaksi/siswa/tagihan/print/{id}/{kurang}/{master}', [TransisCont
 
 
 // Rport
-Route::get('/report/{startDate}/{endDate}', [ReportController::class, 'main']);
-Route::get('/search/report/', [ReportController::class, 'search']);
+Route::get('/report', [ReportController::class, 'main']);
+Route::get('/report/search', [ReportController::class, 'search'])->name('ReportTransaksi');
 
 
 // Pembayaran Siswa

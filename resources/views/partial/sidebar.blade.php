@@ -139,14 +139,14 @@
           </li>
 
           <!-- Gaji -->
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="{{ url('/gaji/' . date('Y')) }}" class="nav-link @if(Request::is('gaji') || Request::is('gaji/*')) active @endif">
               <i class="nav-icon fas fa-edit"></i>
               <p>
                 Gaji
               </p>
             </a>
-          </li>
+          </li> -->
 
           <!-- Bos -->
           <li class="nav-item">
@@ -182,7 +182,7 @@
 
           <!-- Report -->
           <li class="nav-item">
-            <a href="{{ url('/report/' .  now()->format('Y-m-d') . '/' . now()->format('Y-m-d') )}}" class="nav-link @if(Request::is('repot') || Request::is('report/*')) active @endif">
+            <a href="{{ url('/report')}}" class="nav-link @if(Request::is('repot') || Request::is('report/*')) active @endif">
             <i class="nav-icon fas fa-copy"></i>
               <p>
                 Report

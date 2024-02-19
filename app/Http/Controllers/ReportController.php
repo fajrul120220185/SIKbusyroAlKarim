@@ -12,6 +12,10 @@ use App\Models\MTranSiswa;
 use App\Models\SPP;
 use App\Models\Gaji;
 use App\Models\GrandSaldo;
+use App\Models\SaldoSPP;
+use App\Models\SaldoBOS;
+use App\Models\SaldoEkskul;
+use App\Models\SaldoSaving;
 
 class ReportController extends Controller
 {
@@ -20,65 +24,93 @@ class ReportController extends Controller
         $this->middleware('auth');
     }
 
-    public function main($startDate, $endDate)
+    public function main()
     {
 
         $data['title'] = "Report Transaksi";
-        $date = $startDate . '-' . $endDate;
+        
+        $spp = SaldoSpp::orderBy('id', 'desc')->first();
+        $saldoSPP = $spp->saldo;
+        $bos = SaldoBos::orderBy('id', 'desc')->first();
+        $saldoBOS = $bos->saldo;
+        $saving = SaldoSaving::orderBy('id', 'desc')->first();
+        $saldoSaving = $saving->saldo;
+        $ekskul = SaldoEkskul::orderBy('id', 'desc')->first();
+        $saldoEkskul = $ekskul->saldo;
+        $pemasukan = Pemasukan::get();
+        $saldoPemasukan = $pemasukan->sum('jumlah');
+        $kegiatan = MTranSiswa::get();
+        $saldoKegiatan = $kegiatan->sum('saldo');
 
-        list($startYear, $startMonth, $startDay, $endYear, $endMonth, $endDay) = explode('-', $date);
-        // Format the date for daterangepicker (MM/DD/YYYY)
-        $formattedStartDate = sprintf('%02d/%02d/%04d', $startMonth, $startDay, $startYear);
-        $formattedEndDate = sprintf('%02d/%02d/%04d', $endMonth, $endDay, $endYear);
+        $data['saldoTotal'] = $saldoSPP + $saldoBOS + $saldoEkskul + $saldoSaving + $saldoPemasukan + $saldoKegiatan;
+        $data['terbilang'] = $this->terbilang($data['saldoTotal']);
 
-        $data['pemasukan'] = Pemasukan::where('tanggal', '>=', $startDate)->where('tanggal', '<=', $endDate)->orderBy('tanggal', 'asc')->orderBy('transaksi', 'asc')->get();
-        $pemasukanTotal = $data['pemasukan']->sum('jumlah');
-        $transaksi_siswaS = TranSis::select('trans_id', TranSis::raw('MAX(id) as max_id'))
-        ->where('paid_at', '>=', $startDate)
-        ->where('paid_at', '<=', $endDate)
-        ->groupBy('trans_id')
-        ->get();
-    
-    // Mengambil data lengkap berdasarkan max_id
-        $data['transaksi_siswa'] = TranSis::whereIn('id', $transaksi_siswaS->pluck('max_id'))->get();
-        $totalJumlahPerTransId = $data['transaksi_siswa']->pluck('jumlah');
-        $totalJumlahSemuaTransaksi = $totalJumlahPerTransId->sum();
-
-        $spp = SPP::where('paid_at', '>=', $startDate)->where('paid_at', '<=', $endDate)->get();
-        $data['totalSPP'] = $spp->sum('jumlah');
-
-        $data['totalPemasukan'] = $pemasukanTotal + $data['totalSPP'] + $totalJumlahSemuaTransaksi;
-
-
-        $data['pengeluaran'] = Pengeluaran::where('tanggal', '>=', $startDate)->where('tanggal', '<=', $endDate)->orderBy('tanggal', 'asc')->orderBy('transaksi', 'asc')->get();
-        $pengeluaranTotal = $data['pengeluaran']->sum('jumlah');
-        $gaji = Gaji::where('paid_at', '>=', $startDate)->where('paid_at', '<=', $endDate)->get();
-        $data['totalGaji'] = $gaji->sum('total');
-        $data['totalPengeluaran'] = $pengeluaranTotal + $data['totalGaji'];
-
-        $data['totalTrans'] =  $data['totalPemasukan'] - $data['totalPengeluaran'];
-        $data['GS'] = GrandSaldo::orderBy('id', 'desc')->first();
-
-        $grandSaldo = $data['GS']->saldo;
-
-        $data['totalSebelumnya'] = $grandSaldo - $data['totalTrans'];
-        $data['terbilang'] = $this->terbilang($data['GS']->saldo);
-
-        return view('report.main', compact('formattedStartDate', 'formattedEndDate', 'totalJumlahSemuaTransaksi'))->with($data);
+        return view('report.main', compact('saldoSPP' , 'saldoBOS' , 'saldoEkskul' , 'saldoSaving' , 'saldoPemasukan' , 'saldoKegiatan'))->with($data);
     }
         
     public function search (Request $request)
     {
-        $time = $request->time;
+        $data['title'] = "Laporan Bulan " . $request->bulan . '-' . $request->tahun;
 
-        list($startDate, $endDate) = explode(' - ', $time);
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
 
-        // Format the dates if needed
-        $startDate = date('Y-m-d', strtotime($startDate));
-        $endDate = date('Y-m-d', strtotime($endDate));
+        $bulanNumerik = Carbon::parse("1 $bulan")->month;
+        $lastMonthName = date('F', strtotime('last month', strtotime($bulan)));
+        $data['bulanLalu'] = $lastMonthName;
 
-        var_dump($startDate, $endDate);
-        die();
+        // SPP
+        $spp = SaldoSPP::where('keluar_masuk', '=', 'M')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['saldoSPP'] = $spp->sum('jumlah_km');
+        $data['saldoSPPKemarin'] =  SaldoSPP::where('bulan', $lastMonthName)->where('tahun', $tahun)->orderBy('id', 'desc')->first();
+        $pengeluaranSPP = SaldoSPP::where('keluar_masuk', '=', 'K')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['keluarSPP'] = $pengeluaranSPP->sum('jumlah_km');
+
+
+        // EKSKUL
+        $ekskul = SaldoEkskul::where('keluar_masuk', '=', 'M')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['saldoEkskul'] = $ekskul->sum('jumlah_km');
+        $data['saldoEkskulKemarin'] =  SaldoEkskul::where('bulan', $lastMonthName)->where('tahun', $tahun)->orderBy('id', 'desc')->first();
+        $pengeluaranEkskul = SaldoEkskul::where('keluar_masuk', '=', 'K')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['keluarEkskul'] = $pengeluaranEkskul->sum('jumlah_km');
+
+        // BOS
+        $bos = SaldoBOS::where('keluar_masuk', '=', 'M')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['saldoBos'] = $bos->sum('jumlah_km');
+        $data['saldoBosKemarin'] =  SaldoBOS::where('bulan', $lastMonthName)->where('tahun', $tahun)->orderBy('id', 'desc')->first();
+        $pengeluaranEkskul = SaldoBOS::where('keluar_masuk', '=', 'K')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['keluarBos'] = $pengeluaranEkskul->sum('jumlah_km');
+
+        $pemasukan = Pemasukan::whereYear('tanggal', $tahun)->whereMonth('tanggal', $bulanNumerik)->get();
+        $data['saldoPemasukan'] = $pemasukan->sum('jumlah_diterima');
+
+        $pengeluaran = Pengeluaran::whereYear('tanggal', $tahun)->whereMonth('tanggal', $bulanNumerik)->whereNotIn('sumber', ['Saving', 'SPP', 'BOS', 'Ekskul'])->where('sumber', 'not like', 'Kegiatan Siswa%')->get();
+        $data['saldoPengeluaran'] = $pengeluaran->sum('jumlah');
+
+        // TotMasuk
+        $data['totalPemasukan'] = $data['saldoSPP'] + ($data['saldoSPPKemarin'] ? $data['saldoSPPKemarin']->saldo : 0) + $data['saldoEkskul'] +  ($data['saldoEkskulKemarin'] ? $data['saldoEkskulKemarin']->saldo : 0) + $data['saldoBos'] + ($data['saldoBosKemarin'] ? $data['saldoBosKemarin']->saldo : 0) + $data['saldoPemasukan'];
+        $data['terbilangMasuk'] = $this->terbilang($data['totalPemasukan']);
+        
+        // TotKeluar
+        $data['totalPengeluaran'] = $data['keluarSPP'] + $data['keluarEkskul'] +  $data['keluarBos'] +  $data['saldoPengeluaran'];
+        $data['terbilangKeluar'] = $this->terbilang($data['totalPengeluaran']);
+
+        // Laporan Saving
+        $savingLalu = SaldoSaving::where('bulan', $lastMonthName)->orderBy('id', 'desc')->first();
+        if ($savingLalu) {
+            $data['saldoAwalSaving'] = $savingLalu->saldo;
+        } else {
+            $data['saldoAwalSaving'] = 0;
+        }
+        $data['savingMasuk'] = SaldoSaving::where('keluar_masuk', '=', 'M')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['saldoSavingMasuk'] = $data['savingMasuk']->sum('jumlah_km');
+
+        $data['savingKeluar'] = SaldoSaving::where('keluar_masuk', '=', 'K')->where('bulan', $bulan)->where('tahun', $tahun)->get();
+        $data['saldoSavingKeluar'] = $data['savingKeluar']->sum('jumlah_km');
+
+
+
+        return view('report.report-all', compact('bulan', 'tahun'), $data);
     }
 
     private function terbilang($number)

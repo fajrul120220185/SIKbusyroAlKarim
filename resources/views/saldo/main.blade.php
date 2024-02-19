@@ -12,7 +12,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="">Saldo Saving Bulan Lalu</label>
-                        <input type="text" class="form-control" value="" readonly>
+                        <input type="text" class="form-control" value="Rp. {{number_format ($saldoSavingKemarin),2,0}}" readonly>
                     </div>
                 </div>
                 <div class="col-4">
@@ -39,7 +39,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="">Saldo SPP Bulan Lalu</label>
-                        <input type="text" class="form-control" value="" readonly>
+                        <input type="text" class="form-control" value=" Rp. {{number_format ($saldoSPPKemarin),2,0}}" readonly>
                     </div>
                 </div>
                 <div class="col-4">
@@ -66,7 +66,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="">Saldo BOS Bulan Lalu</label>
-                        <input type="text" class="form-control" value="" readonly>
+                        <input type="text" class="form-control" value="Rp. {{number_format ($saldoBOSKemarin),2,0}}" readonly>
                     </div>
                 </div>
                 <div class="col-4">
@@ -93,7 +93,7 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="">Saldo Ekskul Bulan Lalu</label>
-                        <input type="text" class="form-control" value="" readonly>
+                        <input type="text" class="form-control" value="Rp. {{number_format ($saldoEkskulKemarin),2,0}}" readonly>
                     </div>
                 </div>
                 <div class="col-4">

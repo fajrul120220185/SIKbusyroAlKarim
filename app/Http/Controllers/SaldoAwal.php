@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\SaldoSPP as SPP;
-use App\Models\Saldobos as BOS;
+use App\Models\SaldoBOS as BOS;
 use App\Models\SaldoEkskul as Ekskul;
 use App\Models\SaldoSaving as Saving;
 use Auth;
@@ -51,6 +51,60 @@ class SaldoAwal extends Controller
         }
 
         $data['user'] = Auth::user()->name;
+
+        $currentMonthName = date('F');
+        $currentYear = date('Y');
+
+        $lastMonthName = date('F', strtotime('last month'));
+
+        $sppKemarin = SPP::where('bulan', $lastMonthName)->orderBy('id', 'desc')->first();
+        if (!empty($sppKemarin)) {
+            $data['saldoSPPKemarin'] = $sppKemarin->saldo; 
+        }else {
+            $sppK = SPP::orderBy('id', 'desc')->first();
+            if (!empty($sppK)) {
+               $data['saldoSPPKemarin'] = $sppK->saldo;
+            }else {
+                $data['saldoSPPKemarin'] = null;
+            }
+        }
+
+        $savingKemarin = Saving::where('bulan', $lastMonthName)->orderBy('id', 'desc')->first();
+        if (!empty($savingKemarin)) {
+            $data['saldoSavingKemarin'] = $savingKemarin->saldo; 
+        }else {
+            $sppK = Saving::orderBy('id', 'desc')->first();
+            if (!empty($sppK)) {
+               $data['saldoSavingKemarin'] = $sppK->saldo;
+            }else {
+                $data['saldoSavingKemarin'] = null;
+            }
+        }
+
+        $bosKemarin = BOS::where('bulan', $lastMonthName)->orderBy('id', 'desc')->first();
+        if (!empty($bosKemarin)) {
+            $data['saldoBOSKemarin'] = $bosKemarin->saldo; 
+        }else {
+            $sppK = BOS::orderBy('id', 'desc')->first();
+            if (!empty($sppK)) {
+               $data['saldoBOSKemarin'] = $sppK->saldo;
+            }else {
+                $data['saldoBOSKemarin'] = null;
+            }
+        }
+
+        $ekskulKemarin = Ekskul::where('bulan', $lastMonthName)->orderBy('id', 'desc')->first();
+        if (!empty($ekskulKemarin)) {
+            $data['saldoEkskulKemarin'] = $ekskulKemarin->saldo; 
+        }else {
+            $sppK = Ekskul::orderBy('id', 'desc')->first();
+            if (!empty($sppK)) {
+               $data['saldoEkskulKemarin'] = $sppK->saldo;
+            }else {
+                $data['saldoEkskulKemarin'] = null;
+            }
+        }
+        
         return view('saldo.main', $data);
     }
 
